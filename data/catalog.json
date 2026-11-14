@@ -1,0 +1,22 @@
+{
+  "store": {
+    "address": "347, Phase 1-B, Shivalik Avenue\nNaya Nangal, Punjab - 140126",
+    "hours": "Monday to Sunday: 10:00 am – 7:00 pm",
+    "phone": "",
+    "whatsapp": "",
+    "email": "",
+    "mapUrl": "https://www.google.com/maps/search/?api=1&query=347%2C%20Phase%201-B%2C%20Shivalik%20Avenue%2C%20Naya%20Nangal%2C%20Punjab%20140126",
+    "parking": "",
+    "announcement": "",
+    "currency": "₹"
+  },
+  "departments": {
+    "fashion": ["Jeans", "T-Shirts", "Shirts", "Trousers & Chinos", "Ethnic Wear", "Dresses & Tops", "Jackets & Sweatshirts", "Innerwear & Nightwear", "Kids Wear", "Footwear"],
+    "electronics": ["Cameras", "Tripods & Stands", "Projectors", "Headphones & Earbuds", "Speakers", "Smartwatches", "Power Banks", "Chargers & Cables", "Mobile Accessories", "Computer Accessories"],
+    "home-living": ["Home Décor", "Lighting", "Kitchen & Dining", "Bedding", "Bath", "Storage & Organisers", "Cleaning Essentials"],
+    "gifts": ["Watches", "Wallets & Belts", "Sunglasses", "Fragrances", "Jewellery", "Bags & Travel", "Gift Sets"],
+    "sports": ["Gym Equipment", "Yoga & Fitness Mats", "Sportswear", "Sports Shoes", "Bottles & Shakers", "Cricket", "Football", "Badminton & Tennis", "Cycling"],
+    "more": ["Stationery", "Toys & Games", "Caps & Hats", "Personal Care", "Travel Essentials", "Seasonal & Festive"]
+  },
+  "products": []
+}
