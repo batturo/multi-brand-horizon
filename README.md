@@ -1,49 +1,96 @@
 # Multi Brand Horizon
 
-Website for Multi Brand Horizon, 347, Phase 1-B, Shivalik Avenue, Naya Nangal, Punjab - 140126.
+Online shop for Multi Brand Horizon, Naya Nangal, Punjab: open-box and surplus
+branded apparel, footwear and accessories.
 
-Live site: https://batturo.github.io/multi-brand-horizon/
+Built with Next.js (App Router, TypeScript), Tailwind CSS and Supabase
+(Postgres, Auth, Storage). Deployed on Vercel.
 
-Everything the site shows comes from one file: [`data/catalog.json`](data/catalog.json).
-Edit it on GitHub (open the file, click the pencil icon, then **Commit changes**). The site updates within a minute or two.
+> Status: Phase 1 (foundation). Storefront, WhatsApp ordering, admin, SEO and
+> analytics come in later phases. A full setup and deploy guide is written in
+> Phase 6.
 
-## Add a product
+## Business facts
 
-1. Upload the photo to the [`images`](images) folder (**Add file → Upload files**). JPG or PNG, ideally square and under 1 MB.
-2. Open `data/catalog.json` and add an entry inside `"products": [ ... ]`. Put a comma between entries.
+Every shop detail (address, hours, phones, GSTIN, policies) lives in
+[`config/store.ts`](config/store.ts). Anything not yet confirmed is set to
+`TODO` and is hidden on the site rather than guessed. List what is still open:
 
-```json
-{
-  "name": "Slim Fit Jeans",
-  "brand": "Levi's",
-  "category": "fashion",
-  "section": "Jeans",
-  "price": 2499,
-  "mrp": 3299,
-  "description": "Stretch denim. Waist 28 to 38.",
-  "image": "images/slim-fit-jeans.jpg",
-  "inStock": true,
-  "featured": false,
-  "added": "2026-11-20"
-}
+```bash
+npm run todos
 ```
 
-| Field | What to put |
-|---|---|
-| `category` | One of `fashion`, `electronics`, `home-living`, `gifts`, `sports`, `more` |
-| `section` | A subsection name exactly as written under `departments`, or `""` for none |
-| `price` | Selling price as a number, or `null` to show "Price in store" |
-| `mrp` | Original price as a number to show a discount, or `null` |
-| `inStock` | `true` or `false` (shows "Sold out") |
-| `featured` | `true` to show it first under New arrivals on the home page |
-| `added` | Date added, `YYYY-MM-DD`. Newest show first |
+## Local setup
 
-## Change subsections
+1. Install Node.js 20.9 or newer, then install packages:
 
-Edit the lists under `"departments"`. Order in the list is the order on the website.
+   ```bash
+   npm install
+   ```
 
-## Store details
+2. Create a Supabase project. Copy `.env.example` to `.env.local` and fill in
+   the URL and keys from Supabase > Project Settings > API Keys.
 
-Edit the fields under `"store"`. Put the phone and WhatsApp number in to turn on the
-"Ask about this item" buttons on every product. Hours use one line per day or range;
-write `\n` between lines, e.g. `"Monday to Saturday: 10:00 am – 7:00 pm\nSunday: Closed"`.
+3. Apply the database schema. Either link the project with the Supabase CLI:
+
+   ```bash
+   npx supabase link --project-ref YOUR_PROJECT_REF
+   ```
+
+   ```bash
+   npx supabase db push
+   ```
+
+   or paste each file in `supabase/migrations/` (in name order) into the
+   Supabase SQL editor.
+
+4. Optional: add the 12 sample products so the pages have something to show.
+
+   ```bash
+   npm run samples:add
+   ```
+
+   Remove them before launch:
+
+   ```bash
+   npm run samples:remove
+   ```
+
+5. Run the site:
+
+   ```bash
+   npm run dev
+   ```
+
+## Checks
+
+```bash
+npm run check
+```
+
+runs lint, type check, tests and a production build. The database tests run
+the real migrations in an in-memory Postgres (PGlite), so they need no Docker
+or Supabase account.
+
+## Database at a glance
+
+| Table | What it holds | Who can read | Who can write |
+|---|---|---|---|
+| `categories` | Name, slug, parent, visible flag, intro text | Public: visible ones only | Admins |
+| `products` | Title, brand (plain text), category, gender, condition, MRP, price, description, images, published flag | Public: published products in visible categories | Admins |
+| `variants` | Size, colour, stock per product | Public: for visible products | Admins |
+| `orders` | Order number, items snapshot, customer details, payment preference, status | Admins | Anyone can place one (always starts as pending) |
+| `settings` | Sale banner text, delivery fee | Public | Admins |
+| `admin_users` | Which logins are admins | Admins | SQL only |
+
+Rules enforced by the database, not just the website:
+
+- A hidden category, its child categories and every product in them cannot be
+  read by the public at all.
+- When an order is placed, prices, totals and the delivery fee are rebuilt from
+  the database. Whatever the browser sends for prices is ignored.
+- Placing an order does not reduce stock. Stock is reduced only when an admin
+  sets the order to confirmed, and put back if a confirmed or dispatched order
+  is cancelled. If two customers ask for the last unit, the second confirm
+  fails and the admin decides.
+- Price can never be above MRP. Stock can never go below zero.
