@@ -1,5 +1,6 @@
 "use client";
 
+import { sizeText } from "@/lib/catalog/model";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -78,7 +79,7 @@ export function CartView({ deliveryFee }: { deliveryFee: number | null }) {
                   <Link href={`/p/${l.slug}`} className="block font-medium hover:underline">
                     {l.title}
                   </Link>
-                  <p className="text-sm text-muted">{[l.size && `Size ${l.size}`, l.colour].filter(Boolean).join(", ")}</p>
+                  <p className="text-sm text-muted">{[sizeText(l.size), l.colour].filter(Boolean).join(", ")}</p>
                   <p className="mt-1 text-sm">
                     <span className="font-semibold">{formatINR(l.price)}</span>
                     {off > 0 && (
@@ -142,9 +143,12 @@ export function CartView({ deliveryFee }: { deliveryFee: number | null }) {
           </div>
         </dl>
         <p className="mt-2 text-xs text-muted">Prices include taxes. {checked ? "Prices and stock checked just now." : "Checking prices and stock…"}</p>
-        <p className="mt-4 rounded bg-ink/5 p-3 text-sm">
-          Ordering online opens soon. Until then, visit the shop or call us to buy these items.
-        </p>
+        <Link
+          href="/checkout"
+          className="mt-4 flex min-h-12 items-center justify-center rounded bg-ink px-5 font-semibold text-white hover:bg-ink-soft"
+        >
+          Checkout
+        </Link>
       </aside>
     </div>
   );

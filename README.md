@@ -6,7 +6,7 @@ branded apparel, footwear and accessories.
 Built with Next.js (App Router, TypeScript), Tailwind CSS and Supabase
 (Postgres, Auth, Storage). Deployed on Vercel.
 
-> Status: Phase 2 (storefront) done. WhatsApp ordering, admin, SEO and
+> Status: Phase 3 (WhatsApp ordering) done. Admin, SEO and
 > analytics come in later phases. A full setup and deploy guide is written in
 > Phase 6.
 
@@ -82,7 +82,20 @@ This only works while Supabase is not configured, and never in production.
 | `/p/[slug]` | Product. Sold-out products keep their page and show similar items |
 | `/search?q=` | Search (also used for "shop by brand") |
 | `/cart` | Cart, kept in the visitor's browser and re-checked against live price and stock |
+| `/checkout` | Name, mobile, address, PIN code, COD or UPI. Saves the order as pending |
+| `/checkout/sent` | Order number, then opens WhatsApp with the order message (or asks the customer to wait for a call if no WhatsApp number is set) |
 | `/about`, `/visit`, `/delivery`, `/returns`, `/contact`, `/privacy`, `/terms` | Information pages, filled from `config/store.ts` |
+
+## How a WhatsApp order works
+
+1. The customer fills in the checkout form. Phone and PIN code are checked
+   in the browser and again on the server.
+2. The database prices the order from its own data, saves it as **pending**
+   and returns an order number like `MBH-10001`. Stock is not reduced.
+3. The customer sees the order number, and WhatsApp opens to the shop's
+   number with the order number, items, sizes, total and address filled in.
+4. The admin confirms the order (Phase 4). Only then is stock reduced. If two
+   customers asked for the last piece, the second confirm is refused.
 
 ## Checks
 

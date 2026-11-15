@@ -115,3 +115,10 @@ export function compareSizes(a: string, b: string): number {
 export function variantLabel(v: Pick<CatalogVariant, "size" | "colour">): string {
   return [v.size, v.colour].filter(Boolean).join(" / ") || "One size";
 }
+
+/** "M" -> "Size M", "One size" stays as is, "" -> "". */
+export function sizeText(size: string): string {
+  const s = size.trim();
+  if (!s) return "";
+  return /^(one size|free size)$/i.test(s) ? s : `Size ${s}`;
+}
