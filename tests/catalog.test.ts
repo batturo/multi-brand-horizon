@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { demoCatalog } from "@/lib/catalog/demo";
+import { demoCatalog } from "./fixtures/sample-catalog";
 import {
   applyFilters,
   facets,

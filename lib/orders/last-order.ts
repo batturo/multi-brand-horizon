@@ -4,7 +4,13 @@ import type { PlacedOrder } from "@/lib/orders/message";
 
 const KEY = "mbh-last-order";
 
-export type LastOrder = { order: PlacedOrder; whatsappUrl: string | null; openedWhatsapp: boolean };
+export type LastOrder = {
+  order: PlacedOrder;
+  whatsappUrl: string | null;
+  openedWhatsapp: boolean;
+  /** Local preview: saved only in the in-memory database. */
+  preview?: boolean;
+};
 
 /** Kept for this browser tab only, so the confirmation survives a trip to WhatsApp and back. */
 export function saveLastOrder(o: LastOrder) {

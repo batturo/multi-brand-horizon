@@ -15,6 +15,11 @@ export function isSvg(src: string): boolean {
   return /\.svg(\?|$)/i.test(src);
 }
 
+/** Images next/image should pass through as-is (vectors, local preview uploads). */
+export function skipOptimization(src: string): boolean {
+  return isSvg(src) || src.startsWith("/preview-images/");
+}
+
 export function imageAlt(img: ProductImage | undefined, fallback: string): string {
   return img?.alt?.trim() || fallback;
 }

@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { isSvg, productImageUrl } from "@/lib/catalog/images";
+import { productImageUrl, skipOptimization } from "@/lib/catalog/images";
 import type { ProductImage as Img } from "@/lib/types";
 
 /** Product photo on a white square-ish area, sized for phones first. */
@@ -32,7 +32,7 @@ export function ProductImage({
         fill
         sizes={sizes}
         className="object-contain"
-        unoptimized={isSvg(src)}
+        unoptimized={skipOptimization(src)}
         loading={eager ? "eager" : "lazy"}
         fetchPriority={eager ? "high" : undefined}
       />

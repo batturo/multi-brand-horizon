@@ -6,7 +6,7 @@ branded apparel, footwear and accessories.
 Built with Next.js (App Router, TypeScript), Tailwind CSS and Supabase
 (Postgres, Auth, Storage). Deployed on Vercel.
 
-> Status: Phase 3 (WhatsApp ordering) done. Admin, SEO and
+> Status: Phase 4 (admin) done. SEO and
 > analytics come in later phases. A full setup and deploy guide is written in
 > Phase 6.
 
@@ -64,8 +64,8 @@ npm run todos
 
 ## Preview without a database
 
-To look at the pages before Supabase is set up, run with the sample
-products built into the code:
+To look at the shop and the admin before Supabase is set up, run against an
+in-memory copy of the database with the sample products:
 
 ```bash
 DEMO_CATALOG=samples npm run dev
@@ -85,6 +85,41 @@ This only works while Supabase is not configured, and never in production.
 | `/checkout` | Name, mobile, address, PIN code, COD or UPI. Saves the order as pending |
 | `/checkout/sent` | Order number, then opens WhatsApp with the order message (or asks the customer to wait for a call if no WhatsApp number is set) |
 | `/about`, `/visit`, `/delivery`, `/returns`, `/contact`, `/privacy`, `/terms` | Information pages, filled from `config/store.ts` |
+
+## Admin
+
+Open `/admin` on your phone. Screens:
+
+| Screen | What it does |
+|---|---|
+| Home | Pending orders, products in shop, sold out, and a big Add button |
+| Orders | Filter by status. Call or WhatsApp the customer. Confirm (takes stock), dispatched, delivered, cancel (puts stock back if it was taken) |
+| Products | Search, quick stock edit per size, Duplicate, Mark sold, Publish/Unpublish, and select many to publish or unpublish together |
+| Add / Edit product | Take or pick photos (shrunk on the phone before upload), title, brand, category, for, condition, MRP, price, sizes with quantities, publish |
+| Settings | Sale banner, delivery fee, category visibility and intro text |
+
+### Add an admin user
+
+1. Supabase > Authentication > Users > **Add user**. Enter email and password
+   and tick "Auto confirm".
+2. Supabase > SQL editor, run (with that email):
+
+   ```sql
+   insert into public.admin_users (user_id)
+   select id from auth.users where email = 'owner@example.com';
+   ```
+
+3. Recommended: Supabase > Authentication > Sign In / Providers, turn off
+   "Allow new users to sign up". Only people you add can log in.
+
+A login that is not in `admin_users` can sign in but sees "Not an admin" and
+cannot read or change anything (the database refuses).
+
+### Trying the admin without Supabase
+
+`DEMO_CATALOG=samples npm run dev` runs the whole shop and admin against an
+in-memory copy of the real database schema with the sample products. No
+login is needed. Everything resets when the server stops.
 
 ## How a WhatsApp order works
 

@@ -7,5 +7,5 @@ if (todos.length === 0) {
 } else {
   console.log(`${todos.length} open TODOs in config/store.ts:`);
   for (const t of todos) console.log(`  - ${t}`);
-  console.log("\nAlso set in the admin once it exists: delivery fee, sale banner, category intro text.");
+  console.log("\nAlso set in the admin (Settings): delivery fee, sale banner, category intro text.");
 }

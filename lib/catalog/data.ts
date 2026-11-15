@@ -1,8 +1,7 @@
 import { cacheLife, cacheTag } from "next/cache";
-import { isSupabaseConfigured } from "@/lib/env";
+import { backendMode, localDb } from "@/lib/backend";
 import { createPublicClient } from "@/lib/supabase/public";
 import { buildCatalog, type Catalog, type CatalogProduct } from "@/lib/catalog/model";
-import { demoCatalog } from "@/lib/catalog/demo";
 import type { Category, Product, Settings, Variant } from "@/lib/types";
 
 /** Cache tag for everything read from the catalogue. Admin edits revalidate it. */
@@ -10,13 +9,29 @@ export const CATALOG_TAG = "catalog";
 
 const EMPTY: Catalog = { categories: [], products: [], settings: { sale_banner_text: null, delivery_fee: null } };
 
-/** Preview mode: sample products from code. Never in production. */
+/** Local preview mode (see lib/backend.ts). Never in production. */
 export function isDemoCatalog(): boolean {
-  return (
-    !isSupabaseConfigured() &&
-    process.env.DEMO_CATALOG === "samples" &&
-    process.env.VERCEL_ENV !== "production"
-  );
+  return backendMode() === "local";
+}
+
+/** Same reads as below, run as the public (anon) role on the local database. */
+async function localCatalog(): Promise<Catalog> {
+  const { asRole } = await import("@/lib/local-db/create");
+  const db = await localDb();
+  return asRole(db, { role: "anon" }, async (q) => {
+    const categories = await q<Category>(
+      `select id, name, slug, parent_id, is_visible, intro, sort_order from public.categories`,
+    );
+    const products = await q<Product>(
+      `select id, title, slug, brand, category_id, gender, condition, mrp, price, description, images,
+              is_published, is_sample, to_json(published_at) #>> '{}' as published_at, to_json(created_at) #>> '{}' as created_at,
+              to_json(updated_at) #>> '{}' as updated_at
+       from public.products`,
+    );
+    const variants = await q<Variant>(`select id, product_id, size, colour, stock, sort_order from public.variants`);
+    const [settings] = await q<Settings>(`select sale_banner_text, delivery_fee from public.settings`);
+    return buildCatalog(categories, products, variants, settings ?? null);
+  });
 }
 
 const PAGE = 1000; // Supabase returns at most 1000 rows per request by default.
@@ -44,7 +59,7 @@ export async function getCatalog(): Promise<Catalog> {
   cacheLife("hours");
   cacheTag(CATALOG_TAG);
 
-  if (isDemoCatalog()) return demoCatalog();
+  if (isDemoCatalog()) return localCatalog();
   const db = createPublicClient();
   if (!db) return EMPTY;
 
