@@ -2,7 +2,7 @@
 // replaced. Usage: npm run samples:add
 import { config } from "dotenv";
 import { createServiceClient } from "../lib/supabase/service";
-import { buildSampleRows } from "./sample-products";
+import { buildSampleRows } from "../lib/catalog/samples";
 
 config({ path: ".env.local" });
 config();

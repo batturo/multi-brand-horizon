@@ -51,6 +51,19 @@ export const store = {
   /** TODO: the shop's Google Maps link (Share > Copy link). */
   mapUrl: TODO as string | Todo,
 
+  /** TODO: nearby landmarks people know, e.g. "Opposite ...", one per line. */
+  landmarks: TODO as string[] | Todo,
+  /** TODO: short directions from the main road or bus stand, in plain words. */
+  directions: TODO as string | Todo,
+  /** TODO: parking note, if any. */
+  parking: TODO as string | Todo,
+  /**
+   * TODO: real photos of the shop front and inside. Put the files in
+   * public/store/ and list them here, e.g.
+   * [{ src: "/store/front.jpg", alt: "Shop front on ... road" }]
+   */
+  storePhotos: TODO as { src: string; alt: string }[] | Todo,
+
   /**
    * TODO: opening hours. The previous website listed
    * "Monday to Sunday: 10:00 am to 7:00 pm". Confirm before using it.
@@ -69,6 +82,8 @@ export const store = {
   /** TODO: live domain with https, no trailing slash, e.g. "https://example.in". */
   siteUrl: TODO as string | Todo,
 
+  /** TODO: usual delivery time, e.g. "2 to 4 days in and around Nangal". */
+  deliveryTime: TODO as string | Todo,
   /** TODO: towns or pincodes the shop delivers to, in plain words. */
   deliveryAreas: TODO as string | Todo,
   /**
@@ -77,6 +92,13 @@ export const store = {
    */
   /** TODO: the return or exchange rule, in plain words. */
   returnsPolicy: TODO as string | Todo,
+
+  /**
+   * TODO: set to true once the shop (ideally with a lawyer or CA) has read
+   * and approved the Privacy and Terms pages. Until then they show a note
+   * that they are drafts.
+   */
+  legalPagesApproved: TODO as boolean | Todo,
 
   currency: "INR",
   locale: "en-IN",

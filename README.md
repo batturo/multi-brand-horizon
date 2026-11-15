@@ -6,7 +6,7 @@ branded apparel, footwear and accessories.
 Built with Next.js (App Router, TypeScript), Tailwind CSS and Supabase
 (Postgres, Auth, Storage). Deployed on Vercel.
 
-> Status: Phase 1 (foundation). Storefront, WhatsApp ordering, admin, SEO and
+> Status: Phase 2 (storefront) done. WhatsApp ordering, admin, SEO and
 > analytics come in later phases. A full setup and deploy guide is written in
 > Phase 6.
 
@@ -61,6 +61,28 @@ npm run todos
    ```bash
    npm run dev
    ```
+
+## Preview without a database
+
+To look at the pages before Supabase is set up, run with the sample
+products built into the code:
+
+```bash
+DEMO_CATALOG=samples npm run dev
+```
+
+This only works while Supabase is not configured, and never in production.
+
+## Pages
+
+| Path | Page |
+|---|---|
+| `/` | Home: sale banner, categories, new arrivals, brands, store location |
+| `/c/[slug]` | Category with filters (brand, size in stock, price, condition) and sorting, all in the URL |
+| `/p/[slug]` | Product. Sold-out products keep their page and show similar items |
+| `/search?q=` | Search (also used for "shop by brand") |
+| `/cart` | Cart, kept in the visitor's browser and re-checked against live price and stock |
+| `/about`, `/visit`, `/delivery`, `/returns`, `/contact`, `/privacy`, `/terms` | Information pages, filled from `config/store.ts` |
 
 ## Checks
 

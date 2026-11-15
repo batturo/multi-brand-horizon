@@ -1,7 +1,7 @@
 import type { PGlite } from "@electric-sql/pglite";
 import { beforeAll, describe, expect, it } from "vitest";
 import { ORDER_STATUSES, canTransition } from "@/lib/orders/status";
-import { SAMPLE_PRODUCTS, buildSampleRows } from "@/scripts/sample-products";
+import { SAMPLE_PRODUCTS, buildSampleRows } from "@/lib/catalog/samples";
 import { as, createTestDb } from "./harness";
 
 const ADMIN = "00000000-0000-4000-8000-00000000000a";

@@ -4,8 +4,8 @@
  * a made-up brand, and a placeholder photo. Remove them all with
  * `npm run samples:remove`.
  */
-import type { Condition } from "../lib/catalog/conditions";
-import type { Gender } from "../lib/types";
+import type { Condition } from "./conditions";
+import type { Gender } from "../types";
 
 type SampleVariant = { size: string; colour: string; stock: number };
 
