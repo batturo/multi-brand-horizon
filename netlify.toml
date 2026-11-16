@@ -1,8 +1,12 @@
-# Netlify build settings. Next.js is detected automatically and served by
-# Netlify's Next.js runtime (no adapter to install).
+# Netlify build settings. Next.js is served by Netlify's Next.js runtime
+# (OpenNext). It is declared here so it always runs; Netlify installs and
+# updates it itself, so it is not pinned in package.json.
 [build]
   command = "npm run build"
   publish = ".next"
 
 [build.environment]
   NODE_VERSION = "22"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
