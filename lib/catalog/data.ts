@@ -9,7 +9,7 @@ export const CATALOG_TAG = "catalog";
 
 const EMPTY: Catalog = { categories: [], products: [], settings: { sale_banner_text: null, delivery_fee: null } };
 
-/** Local preview mode (see lib/backend.ts). Never in production. */
+/** Local preview mode (see lib/backend.ts). Never on a hosted site. */
 export function isDemoCatalog(): boolean {
   return backendMode() === "local";
 }

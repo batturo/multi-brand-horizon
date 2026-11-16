@@ -13,9 +13,11 @@
 export const TODO = null;
 type Todo = typeof TODO;
 
+export type Day = "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday" | "Saturday" | "Sunday";
+
 export type DayHours = {
-  /** e.g. "Monday to Saturday" */
-  days: string;
+  /** Days these hours apply to, e.g. ["Monday", "Tuesday", ...]. */
+  days: Day[];
   /** 24 hour "HH:MM", e.g. "10:00" */
   opens: string;
   closes: string;
@@ -67,6 +69,8 @@ export const store = {
   /**
    * TODO: opening hours. The previous website listed
    * "Monday to Sunday: 10:00 am to 7:00 pm". Confirm before using it.
+   * Format: [{ days: ["Monday", "Tuesday", "Wednesday", "Thursday",
+   * "Friday", "Saturday", "Sunday"], opens: "10:00", closes: "19:00" }]
    */
   hours: TODO as DayHours[] | Todo,
 

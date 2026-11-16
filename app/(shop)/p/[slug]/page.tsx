@@ -4,17 +4,20 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { BuyBox } from "@/components/buy-box";
 import { ConditionBadge } from "@/components/condition-badge";
+import { JsonLd } from "@/components/json-ld";
 import { DeliverySummary } from "@/components/delivery-summary";
 import { Price } from "@/components/price";
 import { ProductGallery } from "@/components/product-gallery";
 import { ProductGrid } from "@/components/product-card";
-import { conditionNote } from "@/lib/catalog/conditions";
+import { conditionLabel, conditionNote } from "@/lib/catalog/conditions";
 import { getCatalog, getProductBySlug } from "@/lib/catalog/data";
-import { similarProducts } from "@/lib/catalog/filters";
+import { similarProducts, sizesInStock } from "@/lib/catalog/filters";
 import { productImageUrl } from "@/lib/catalog/images";
 import { formatINR } from "@/lib/pricing";
 import { absoluteUrl } from "@/lib/site";
 import { whatsappNumber } from "@/lib/store-info";
+import { breadcrumbJsonLd, productJsonLd } from "@/lib/seo/jsonld";
+import { openGraph } from "@/lib/seo/metadata";
 
 // Product pages are fully static and refreshed when the catalogue changes.
 // Products added after a deploy are rendered on their first visit and kept.
@@ -29,15 +32,39 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps<"/p/[slug]">): Promise<Metadata> {
   const { slug } = await params;
   const p = await getProductBySlug(slug);
-  if (!p) return { title: "Not found" };
-  const state = p.soldOut ? "Sold out. " : "";
+  if (!p) return { title: "Not found", robots: { index: false } };
+  const off = p.discount > 0 ? ` (${p.discount}% off MRP ${formatINR(p.mrp)})` : "";
+  const sizes = sizesInStock(p);
+  const description = (
+    p.soldOut
+      ? `Sold out. ${p.brand} ${p.title} was ${formatINR(p.price)}. See similar items at Multi Brand Horizon, Naya Nangal.`
+      : `${p.brand} ${p.title} for ${formatINR(p.price)}${off}. ${conditionLabel(p.condition)}.${
+          sizes.length ? ` Sizes in stock: ${sizes.join(", ")}.` : ""
+        } Multi Brand Horizon, Naya Nangal.`
+  ).slice(0, 160);
+  const image = p.images[0];
   return {
     title: `${p.title} by ${p.brand}, ${formatINR(p.price)}`,
-    description: `${state}${p.brand} ${p.title} for ${formatINR(p.price)} (MRP ${formatINR(p.mrp)}). At Multi Brand Horizon, Naya Nangal.`.slice(
-      0,
-      160,
-    ),
+    description,
     alternates: { canonical: `/p/${p.slug}` },
+    openGraph: openGraph({
+      // WhatsApp shows this title, the description and the photo.
+      title: `${p.brand} ${p.title}: ${formatINR(p.price)}${p.discount > 0 ? `, ${p.discount}% off` : ""}${p.soldOut ? " (sold out)" : ""}`,
+      description,
+      url: `/p/${p.slug}`,
+      ...(image
+        ? {
+            images: [
+              {
+                url: absoluteUrl(productImageUrl(image.src)),
+                ...(image.width ? { width: image.width } : {}),
+                ...(image.height ? { height: image.height } : {}),
+                alt: image.alt || p.title,
+              },
+            ],
+          }
+        : {}),
+    }),
   };
 }
 
@@ -59,6 +86,14 @@ async function ProductContent({ params }: PageProps<"/p/[slug]">) {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-6">
+      <JsonLd data={productJsonLd(p)} />
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: "Home", path: "/" },
+          { name: p.categoryName, path: `/c/${p.categorySlug}` },
+          { name: p.title, path: `/p/${p.slug}` },
+        ])}
+      />
       <nav aria-label="Breadcrumb" className="text-sm text-muted">
         <ol className="flex flex-wrap gap-2">
           <li>

@@ -9,9 +9,8 @@ function toBlob(canvas: HTMLCanvasElement, type: string, quality: number): Promi
 }
 
 /**
- * Resize and re-encode a photo in the browser before upload: WebP when the
- * browser can make it, JPEG otherwise. Honors the phone's rotation (EXIF)
- * through createImageBitmap.
+ * Resize and re-encode a photo in the browser before upload, as JPEG.
+ * Honors the phone's rotation (EXIF) through createImageBitmap.
  */
 export async function compressImage(file: File): Promise<Compressed> {
   const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
@@ -26,8 +25,7 @@ export async function compressImage(file: File): Promise<Compressed> {
       ctx.fillStyle = "#ffffff"; // transparent PNGs get a white background
       ctx.fillRect(0, 0, width, height);
       ctx.drawImage(bitmap, 0, 0, width, height);
-      let blob = await toBlob(canvas, "image/webp", attempt.quality);
-      if (!blob || blob.type !== "image/webp") blob = await toBlob(canvas, "image/jpeg", attempt.quality);
+      const blob = await toBlob(canvas, "image/jpeg", attempt.quality);
       if (blob && blob.size <= MAX_BYTES) return { blob, width, height, type: blob.type };
     }
     throw new Error("This photo is too large even after shrinking. Try another photo.");

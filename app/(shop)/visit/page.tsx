@@ -1,17 +1,33 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { store } from "@/config/store";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
+import { JsonLd } from "@/components/json-ld";
 import { StoreLocation } from "@/components/store-location";
+import { breadcrumbJsonLd, localBusinessJsonLd } from "@/lib/seo/jsonld";
+import { openGraph } from "@/lib/seo/metadata";
+import { absoluteUrl } from "@/lib/site";
+
+const logoUrl = existsSync(join(process.cwd(), "public", "logo.png")) ? absoluteUrl("/logo.png") : null;
 
 export const metadata: Metadata = {
   title: "Visit the store in Naya Nangal",
   description: "Find Multi Brand Horizon in Naya Nangal, Punjab: address, opening hours, directions and phone numbers.",
   alternates: { canonical: "/visit" },
+  openGraph: openGraph({
+    title: "Visit Multi Brand Horizon in Naya Nangal",
+    description: "Address, opening hours, directions and phone numbers.",
+    url: "/visit",
+    ...(store.storePhotos?.[0] ? { images: [{ url: store.storePhotos[0].src, alt: store.storePhotos[0].alt }] } : {}),
+  }),
 };
 
 export default function VisitPage() {
   return (
     <>
+      <JsonLd data={localBusinessJsonLd({ logoUrl })} />
+      <JsonLd data={breadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "Visit the store", path: "/visit" }])} />
       <section className="bg-ink text-white">
         <div className="mx-auto max-w-6xl px-4 py-8">
           <h1 className="text-2xl font-bold">Visit the store in Naya Nangal</h1>
@@ -45,6 +61,18 @@ export default function VisitPage() {
           <>
             <h2>Parking</h2>
             <p>{store.parking}</p>
+          </>
+        )}
+        {store.geo && (
+          <>
+            <h2>Map</h2>
+            <iframe
+              title={`Map showing ${store.name} in Naya Nangal`}
+              src={`https://www.google.com/maps?q=${store.geo.latitude},${store.geo.longitude}&z=16&output=embed`}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              className="mt-3 aspect-[4/3] w-full rounded border border-line"
+            />
           </>
         )}
         <h2>Before you come</h2>

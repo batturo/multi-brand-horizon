@@ -94,7 +94,7 @@ export function ProductForm({
       try {
         const c = await compressImage(list[i]);
         const form = new FormData();
-        form.append("file", new File([c.blob], `photo.${c.type === "image/webp" ? "webp" : "jpg"}`, { type: c.type }));
+        form.append("file", new File([c.blob], "photo.jpg", { type: c.type }));
         const r = await uploadImageAction(form);
         if (!r.ok) throw new Error(r.error);
         setPhotos((p) =>

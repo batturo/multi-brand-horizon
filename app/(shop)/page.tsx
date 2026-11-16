@@ -1,9 +1,24 @@
+import type { Metadata } from "next";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import Link from "next/link";
+import { JsonLd } from "@/components/json-ld";
 import { store } from "@/config/store";
 import { ProductGrid } from "@/components/product-card";
 import { StoreLocation } from "@/components/store-location";
 import { getCatalog } from "@/lib/catalog/data";
 import { sortProducts } from "@/lib/catalog/filters";
+import { localBusinessJsonLd } from "@/lib/seo/jsonld";
+import { absoluteUrl } from "@/lib/site";
+
+export const metadata: Metadata = {
+  title: { absolute: `${store.name}: Branded apparel, footwear and accessories in Naya Nangal` },
+  description:
+    "Open-box and surplus branded apparel, footwear and accessories at Multi Brand Horizon, Naya Nangal, Punjab. MRP, our price and condition shown on every item.",
+  alternates: { canonical: "/" },
+};
+
+const logoUrl = existsSync(join(process.cwd(), "public", "logo.png")) ? absoluteUrl("/logo.png") : null;
 
 export default async function HomePage() {
   const { categories, products, settings } = await getCatalog();
@@ -24,6 +39,7 @@ export default async function HomePage() {
 
   return (
     <>
+      <JsonLd data={localBusinessJsonLd({ logoUrl })} />
       {settings.sale_banner_text && (
         <p className="bg-gold px-4 py-2 text-center text-sm font-semibold text-ink">{settings.sale_banner_text}</p>
       )}

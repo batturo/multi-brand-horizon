@@ -1,4 +1,21 @@
-import { store, type DayHours } from "@/config/store";
+import { store, type Day, type DayHours } from "@/config/store";
+
+export const WEEK: Day[] = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
+/** ["Monday".."Saturday"] -> "Monday to Saturday"; gaps are listed with commas. */
+export function formatDays(days: Day[]): string {
+  const idx = [...new Set(days)].map((d) => WEEK.indexOf(d)).filter((i) => i >= 0).sort((a, b) => a - b);
+  if (idx.length === 7) return "Every day";
+  const runs: number[][] = [];
+  for (const i of idx) {
+    const last = runs.at(-1);
+    if (last && i === last[last.length - 1] + 1) last.push(i);
+    else runs.push([i]);
+  }
+  return runs
+    .map((r) => (r.length >= 3 ? `${WEEK[r[0]]} to ${WEEK[r[r.length - 1]]}` : r.map((i) => WEEK[i]).join(", ")))
+    .join(", ");
+}
 
 /** +919041636322 -> +91 90416 36322 */
 export function formatPhone(e164: string): string {
@@ -36,7 +53,7 @@ function to12h(hhmm: string): string {
 }
 
 export function hoursLines(hours: DayHours[] | null = store.hours): { days: string; time: string }[] {
-  return (hours ?? []).map((h) => ({ days: h.days, time: `${to12h(h.opens)} to ${to12h(h.closes)}` }));
+  return (hours ?? []).map((h) => ({ days: formatDays(h.days), time: `${to12h(h.opens)} to ${to12h(h.closes)}` }));
 }
 
 export function whatsappNumber(): string | null {

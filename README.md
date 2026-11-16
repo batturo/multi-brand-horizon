@@ -6,7 +6,7 @@ branded apparel, footwear and accessories.
 Built with Next.js (App Router, TypeScript), Tailwind CSS and Supabase
 (Postgres, Auth, Storage). Deployed on Vercel.
 
-> Status: Phase 4 (admin) done. SEO and
+> Status: Phase 5 (SEO) done.
 > analytics come in later phases. A full setup and deploy guide is written in
 > Phase 6.
 
@@ -71,7 +71,7 @@ in-memory copy of the database with the sample products:
 DEMO_CATALOG=samples npm run dev
 ```
 
-This only works while Supabase is not configured, and never in production.
+This only works on your own computer while Supabase is not configured. It refuses to run on Netlify, Vercel or CI, because its admin has no login.
 
 ## Pages
 
@@ -120,6 +120,25 @@ cannot read or change anything (the database refuses).
 `DEMO_CATALOG=samples npm run dev` runs the whole shop and admin against an
 in-memory copy of the real database schema with the sample products. No
 login is needed. Everything resets when the server stops.
+
+## SEO
+
+- Every page has its own title and description from real data, and a
+  canonical URL. Filtered category URLs point their canonical at the plain
+  category page. Search, cart, checkout and admin are not indexed.
+- `/sitemap.xml` and `/robots.txt` are generated from the database. Hidden
+  categories and unpublished products are never listed.
+- Structured data (JSON-LD): the shop as a ClothingStore on Home and Visit;
+  Product (price, availability, condition, MRP as list price) and
+  BreadcrumbList on product pages; BreadcrumbList on category pages. Only
+  confirmed facts from `config/store.ts` are used. Check a live page with
+  Google's Rich Results Test.
+- Link previews (WhatsApp, Facebook): product pages share the product photo,
+  price and percent off. Other pages share a black and gold card.
+- `/feed.xml`: product feed for Google Merchant Center and Meta catalogues,
+  one item per size. Items without a photo are left out. Only our selling
+  price is sent (MRP is not sent as a "regular price").
+- Category intro text (80 to 120 words) is written in Admin > Settings.
 
 ## How a WhatsApp order works
 

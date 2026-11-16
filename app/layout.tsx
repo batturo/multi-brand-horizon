@@ -10,6 +10,9 @@ export const metadata: Metadata = {
     template: `%s | ${store.name}`,
   },
   description: store.description,
+  openGraph: { siteName: store.name, locale: "en_IN", type: "website" },
+  twitter: { card: "summary_large_image" },
+  formatDetection: { telephone: false },
 };
 
 export const viewport: Viewport = {
