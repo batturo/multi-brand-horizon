@@ -6,9 +6,8 @@ branded apparel, footwear and accessories.
 Built with Next.js (App Router, TypeScript), Tailwind CSS and Supabase
 (Postgres, Auth, Storage). Deployed on Vercel.
 
-> Status: Phase 5 (SEO) done.
-> analytics come in later phases. A full setup and deploy guide is written in
-> Phase 6.
+> Status: Phase 5 (SEO) done. Analytics, speed work and the full setup and
+> deploy guide come in Phase 6.
 
 ## Business facts
 

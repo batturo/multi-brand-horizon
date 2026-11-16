@@ -1,0 +1,8 @@
+# Netlify build settings. Next.js is detected automatically and served by
+# Netlify's Next.js runtime (no adapter to install).
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "22"

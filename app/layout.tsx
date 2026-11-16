@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { store } from "@/config/store";
-import { siteUrl } from "@/lib/site";
+import { isNoindexSite, siteUrl } from "@/lib/site";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -13,6 +13,7 @@ export const metadata: Metadata = {
   openGraph: { siteName: store.name, locale: "en_IN", type: "website" },
   twitter: { card: "summary_large_image" },
   formatDetection: { telephone: false },
+  ...(isNoindexSite() ? { robots: { index: false, follow: false } } : {}),
 };
 
 export const viewport: Viewport = {

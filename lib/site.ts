@@ -21,3 +21,11 @@ export function absoluteUrl(path: string): string {
   if (/^https?:\/\//.test(path)) return path;
   return `${siteUrl()}${path.startsWith("/") ? path : `/${path}`}`;
 }
+
+/**
+ * True when this deploy must not be indexed (e.g. a preview copy of the
+ * shop). Set SITE_NOINDEX=true in the hosting settings.
+ */
+export function isNoindexSite(): boolean {
+  return process.env.SITE_NOINDEX === "true";
+}
