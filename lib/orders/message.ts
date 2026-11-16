@@ -5,6 +5,7 @@ import { PAYMENT_LABELS, type PaymentPreference } from "@/lib/orders/validate";
 export type PlacedOrder = {
   order_number: string;
   items: {
+    product_id?: string;
     title: string;
     brand: string;
     size: string;

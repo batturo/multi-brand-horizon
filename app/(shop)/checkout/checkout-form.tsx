@@ -3,7 +3,8 @@
 import { sizeText } from "@/lib/catalog/model";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
+import { track } from "@/lib/analytics/client";
 import { placeOrderAction } from "./actions";
 import { cartSubtotal, EMPTY_CART } from "@/lib/cart/cart";
 import { useCart, writeCart } from "@/lib/cart/store";
@@ -22,6 +23,24 @@ export function CheckoutForm({ deliveryFee, whatsappNumber }: { deliveryFee: num
   const [values, setValues] = useState<CheckoutInput>({ name: "", phone: "", address: "", pincode: "", payment: "" });
   const [errors, setErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
+  const checkoutTracked = useRef(false);
+
+  // begin_checkout, once, as soon as the saved cart is known.
+  useEffect(() => {
+    if (checkoutTracked.current || cart.lines.length === 0) return;
+    checkoutTracked.current = true;
+    track({
+      name: "begin_checkout",
+      items: cart.lines.map((l) => ({
+        id: l.productId,
+        name: l.title,
+        brand: l.brand,
+        variant: [l.size, l.colour].filter(Boolean).join(" / ") || undefined,
+        price: l.price,
+        quantity: l.quantity,
+      })),
+    });
+  }, [cart]);
 
   if (cart.lines.length === 0) {
     return (

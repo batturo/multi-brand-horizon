@@ -244,3 +244,16 @@ describe("settings and categories", () => {
     expect(gone).toHaveLength(0);
   });
 });
+
+describe("local preview data", () => {
+  it("uses the same ids every time, so prerendered pages match the running server", async () => {
+    const other = await createTestDb({ samples: true });
+    const q = `select p.slug, p.id as pid, v.id as vid, c.id as cid from products p
+               join variants v on v.product_id = p.id join categories c on c.id = p.category_id
+               where p.slug like 'sample-%' order by p.slug, v.sort_order`;
+    const a = await as(db, { role: "owner" }, (x) => x(q));
+    const b = await as(other, { role: "owner" }, (x) => x(q));
+    expect(a.length).toBeGreaterThan(20);
+    expect(b).toEqual(a);
+  });
+});

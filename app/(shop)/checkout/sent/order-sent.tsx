@@ -3,12 +3,31 @@
 import { sizeText } from "@/lib/catalog/model";
 import Link from "next/link";
 import { useEffect, useState, useSyncExternalStore } from "react";
-import { readLastOrder, saveLastOrder } from "@/lib/orders/last-order";
+import { track } from "@/lib/analytics/client";
+import { readLastOrder, saveLastOrder, type LastOrder } from "@/lib/orders/last-order";
 import { flattenAddress } from "@/lib/orders/message";
 import { PAYMENT_LABELS } from "@/lib/orders/validate";
 import { formatINR } from "@/lib/pricing";
 
 const noop = () => () => {};
+
+function trackWhatsapp(last: LastOrder, trigger: "auto" | "button") {
+  const o = last.order;
+  track({
+    name: "whatsapp_order_click",
+    orderNumber: o.order_number,
+    value: o.total,
+    trigger,
+    items: o.items.map((it) => ({
+      id: it.product_id ?? it.title,
+      name: it.title,
+      brand: it.brand,
+      variant: [it.size, it.colour].filter(Boolean).join(" / ") || undefined,
+      price: it.unit_price,
+      quantity: it.quantity,
+    })),
+  });
+}
 
 export function OrderSent({ phones }: { phones: { href: string; label: string }[] }) {
   const last = useSyncExternalStore(noop, readLastOrder, () => null);
@@ -19,6 +38,7 @@ export function OrderSent({ phones }: { phones: { href: string; label: string }[
     if (!last?.whatsappUrl || last.openedWhatsapp) return;
     saveLastOrder({ ...last, openedWhatsapp: true });
     const t = setTimeout(() => {
+      trackWhatsapp(last, "auto");
       setOpening(true);
       window.location.href = last.whatsappUrl!;
     }, 1200);
@@ -60,6 +80,7 @@ export function OrderSent({ phones }: { phones: { href: string; label: string }[
           </p>
           <a
             href={last.whatsappUrl}
+            onClick={() => trackWhatsapp(last, "button")}
             className="flex min-h-12 items-center justify-center rounded bg-gold px-5 font-semibold text-ink hover:bg-ink hover:text-white"
           >
             Send order on WhatsApp

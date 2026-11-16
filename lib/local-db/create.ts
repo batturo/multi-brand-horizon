@@ -31,24 +31,37 @@ export async function createLocalDb(root: string, opts: { samples?: boolean } = 
   return db;
 }
 
+/** Fixed, UUID-shaped ids for preview data (kind 1 = category, 2 = product, 3 = variant). */
+export const fixedId = (kind: number, n: number) => `00000000-0000-4000-900${kind}-${String(n).padStart(12, "0")}`;
+
+/**
+ * Sample products with fixed ids. Fixed ids matter: pages prerendered at
+ * build time and the running server each create their own in-memory
+ * database, and both must agree on ids (for example in a visitor's cart).
+ */
 export async function seedSamples(db: PGlite) {
-  const cats = (await db.query<{ id: string; slug: string }>(`select id, slug from public.categories`)).rows;
-  const rows = buildSampleRows(Object.fromEntries(cats.map((c) => [c.slug, c.id])));
-  for (const { product, variants } of rows) {
-    const p = await db.query<{ id: string }>(
-      `insert into public.products (title, slug, brand, category_id, gender, condition, mrp, price,
-         description, images, is_published, is_sample)
-       values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10::jsonb,$11,$12) returning id`,
+  const cats = (await db.query<{ id: string; slug: string }>(`select id, slug from public.categories order by sort_order, slug`)).rows;
+  for (const [i, c] of cats.entries()) {
+    await db.query(`update public.categories set id = $1 where id = $2`, [fixedId(1, i + 1), c.id]);
+  }
+  const fixedCats = (await db.query<{ id: string; slug: string }>(`select id, slug from public.categories`)).rows;
+  const rows = buildSampleRows(Object.fromEntries(fixedCats.map((c) => [c.slug, c.id])));
+  for (const [i, { product, variants }] of rows.entries()) {
+    const productId = fixedId(2, i + 1);
+    await db.query(
+      `insert into public.products (id, title, slug, brand, category_id, gender, condition, mrp, price,
+         description, images, is_published, is_sample, created_at, published_at)
+       values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11::jsonb,$12,$13,$14,$14)`,
       [
-        product.title, product.slug, product.brand, product.category_id, product.gender, product.condition,
+        productId, product.title, product.slug, product.brand, product.category_id, product.gender, product.condition,
         product.mrp, product.price, product.description, JSON.stringify(product.images), product.is_published,
-        product.is_sample,
+        product.is_sample, new Date(Date.UTC(2026, 0, 1 + i)).toISOString(),
       ],
     );
-    for (const v of variants) {
+    for (const [j, v] of variants.entries()) {
       await db.query(
-        `insert into public.variants (product_id, size, colour, stock, sort_order) values ($1,$2,$3,$4,$5)`,
-        [p.rows[0].id, v.size, v.colour, v.stock, v.sort_order],
+        `insert into public.variants (id, product_id, size, colour, stock, sort_order) values ($1,$2,$3,$4,$5,$6)`,
+        [fixedId(3, (i + 1) * 100 + j + 1), productId, v.size, v.colour, v.stock, v.sort_order],
       );
     }
   }

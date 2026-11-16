@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useId, useState } from "react";
+import { track } from "@/lib/analytics/client";
 import { addToCart, MAX_PER_LINE } from "@/lib/cart/cart";
 import { useCart, writeCart } from "@/lib/cart/store";
 import { productEnquiryMessage, whatsappLink } from "@/lib/whatsapp";
@@ -58,6 +59,17 @@ export function BuyBox({
         stock: chosen.stock,
       }),
     );
+    track({
+      name: "add_to_cart",
+      item: {
+        id: product.id,
+        name: product.title,
+        brand: product.brand,
+        variant: [chosen.size, chosen.colour].filter(Boolean).join(" / ") || undefined,
+        price: product.price,
+        quantity: 1,
+      },
+    });
     setMessage("Added to cart.");
   }
 

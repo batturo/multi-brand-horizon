@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { store } from "@/config/store";
 import { ContactLine, DraftNotice, TextPage } from "@/components/text-page";
+import { gaId, metaPixelId } from "@/lib/analytics/config";
 
 export const metadata: Metadata = {
   title: "Privacy",
@@ -30,6 +31,19 @@ export default function PrivacyPage() {
           site.
         </li>
       </ul>
+
+      {(gaId() || metaPixelId()) && (
+        <>
+          <h2>Visit statistics and ads</h2>
+          <p>
+            We use{" "}
+            {[gaId() && "Google Analytics", metaPixelId() && "the Meta (Facebook and Instagram) Pixel"].filter(Boolean).join(" and ")}{" "}
+            to count visits and see which items people look at, add to cart and order. These tools use cookies and
+            receive the pages you visit, your device and browser details and an approximate location. We do not send them
+            your name, phone number or address. You can block these cookies in your browser settings.
+          </p>
+        </>
+      )}
 
       <h2>How we use it</h2>
       <ul>

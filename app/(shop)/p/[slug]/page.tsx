@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { BuyBox } from "@/components/buy-box";
 import { ConditionBadge } from "@/components/condition-badge";
 import { JsonLd } from "@/components/json-ld";
+import { TrackViewItem } from "@/components/track-view-item";
 import { DeliverySummary } from "@/components/delivery-summary";
 import { Price } from "@/components/price";
 import { ProductGallery } from "@/components/product-gallery";
@@ -87,6 +88,9 @@ async function ProductContent({ params }: PageProps<"/p/[slug]">) {
   return (
     <div className="mx-auto max-w-6xl px-4 py-6">
       <JsonLd data={productJsonLd(p)} />
+      <TrackViewItem
+        item={{ id: p.id, name: p.title, brand: p.brand, category: p.categoryName, price: p.price, quantity: 1 }}
+      />
       <JsonLd
         data={breadcrumbJsonLd([
           { name: "Home", path: "/" },
